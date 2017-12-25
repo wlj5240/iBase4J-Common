@@ -29,13 +29,9 @@ public class RedisSessionDAO extends AbstractSessionDAO {
     private static final int EXPIRE_TIME = 600;
     @Autowired
     private RedisTemplate<Serializable, Serializable> redisTemplate;
-    private RedisConnection redisConnection;
 
     private RedisConnection getRedisConnection() {
-        if (redisConnection == null) {
-            redisConnection = redisTemplate.getConnectionFactory().getConnection();
-        }
-        return redisConnection;
+        return redisTemplate.getConnectionFactory().getConnection();
     }
 
     public void update(Session session) throws UnknownSessionException {
@@ -46,16 +42,26 @@ public class RedisSessionDAO extends AbstractSessionDAO {
         if (session != null) {
             Serializable id = session.getId();
             if (id != null) {
-                getRedisConnection().del(buildRedisSessionKey(id));
+                RedisConnection redisConnection = getRedisConnection();
+                try {
+                    redisConnection.del(buildRedisSessionKey(id));
+                } finally {
+                    redisConnection.close();
+                }
             }
         }
     }
 
     public Collection<Session> getActiveSessions() {
         List<Session> list = InstanceUtil.newArrayList();
-        Set<byte[]> set = getRedisConnection().keys((REDIS_SHIRO_SESSION + "*").getBytes());
-        for (byte[] key : set) {
-            list.add(SerializeUtil.deserialize(getRedisConnection().get(key), SimpleSession.class));
+        RedisConnection redisConnection = getRedisConnection();
+        try {
+            Set<byte[]> set = redisConnection.keys((REDIS_SHIRO_SESSION + "*").getBytes());
+            for (byte[] key : set) {
+                list.add(SerializeUtil.deserialize(redisConnection.get(key), SimpleSession.class));
+            }
+        } finally {
+            redisConnection.close();
         }
         return list;
     }
@@ -63,7 +69,12 @@ public class RedisSessionDAO extends AbstractSessionDAO {
     public void delete(Serializable sessionId) {
         if (sessionId != null) {
             byte[] sessionKey = buildRedisSessionKey(sessionId);
-            getRedisConnection().del(sessionKey);
+            RedisConnection redisConnection = getRedisConnection();
+            try {
+                redisConnection.del(sessionKey);
+            } finally {
+                redisConnection.close();
+            }
         }
     }
 
@@ -76,12 +87,17 @@ public class RedisSessionDAO extends AbstractSessionDAO {
 
     protected Session doReadSession(Serializable sessionId) {
         byte[] sessionKey = buildRedisSessionKey(sessionId);
-        byte[] value = getRedisConnection().get(sessionKey);
-        if (value == null) {
-            return null;
+        RedisConnection redisConnection = getRedisConnection();
+        try {
+            byte[] value = redisConnection.get(sessionKey);
+            if (value == null) {
+                return null;
+            }
+            Session session = SerializeUtil.deserialize(value, SimpleSession.class);
+            return session;
+        } finally {
+            redisConnection.close();
         }
-        Session session = SerializeUtil.deserialize(value, SimpleSession.class);
-        return session;
     }
 
     private void saveSession(Session session) {
@@ -89,7 +105,12 @@ public class RedisSessionDAO extends AbstractSessionDAO {
         byte[] sessionKey = buildRedisSessionKey(session.getId());
         int sessionTimeOut = PropertiesUtil.getInt("session.maxInactiveInterval", EXPIRE_TIME);
         byte[] value = SerializeUtil.serialize(session);
-        getRedisConnection().set(sessionKey, value, Expiration.seconds(sessionTimeOut), SetOption.UPSERT);
+        RedisConnection redisConnection = getRedisConnection();
+        try {
+            redisConnection.set(sessionKey, value, Expiration.seconds(sessionTimeOut), SetOption.UPSERT);
+        } finally {
+            redisConnection.close();
+        }
     }
 
     private byte[] buildRedisSessionKey(Serializable sessionId) {
