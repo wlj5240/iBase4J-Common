@@ -26,7 +26,6 @@ import top.ibase4j.core.util.SerializeUtil;
  * @version 2017年12月24日 下午8:53:39
  */
 public class RedisSessionDAO extends AbstractSessionDAO {
-    private static final String REDIS_SHIRO_SESSION = Constants.SYSTEM_CACHE_NAMESPACE + "SHIRO-SESSION:";
     private static final int EXPIRE_TIME = 600;
     @Autowired
     private RedisTemplate<Serializable, Serializable> redisTemplate;
@@ -57,7 +56,7 @@ public class RedisSessionDAO extends AbstractSessionDAO {
         List<Session> list = InstanceUtil.newArrayList();
         RedisConnection redisConnection = getRedisConnection();
         try {
-            Set<byte[]> set = redisConnection.keys((REDIS_SHIRO_SESSION + "*").getBytes());
+            Set<byte[]> set = redisConnection.keys((Constants.REDIS_SHIRO_SESSION + "*").getBytes());
             for (byte[] key : set) {
                 list.add(SerializeUtil.deserialize(redisConnection.get(key), SimpleSession.class));
             }
@@ -115,6 +114,6 @@ public class RedisSessionDAO extends AbstractSessionDAO {
     }
 
     private byte[] buildRedisSessionKey(Serializable sessionId) {
-        return (REDIS_SHIRO_SESSION + sessionId).getBytes();
+        return (Constants.REDIS_SHIRO_SESSION + sessionId).getBytes();
     }
 }

@@ -48,6 +48,8 @@ public interface Constants {
     static final String ALLUSER_NUMBER = SYSTEM_CACHE_NAMESPACE + "ALLUSER_NUMBER";
     /** TOKEN */
     static final String TOKEN_KEY = SYSTEM_CACHE_NAMESPACE + "TOKEN_KEY";
+    /** SESSION */
+    static final String REDIS_SHIRO_SESSION = SYSTEM_CACHE_NAMESPACE + "SHIRO-SESSION:";
     /***/
     static final String DB_KEY = "90139119";
 
