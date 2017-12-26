@@ -12,8 +12,6 @@ import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.apache.shiro.cache.CacheManager;
 
-import top.ibase4j.core.Constants;
-
 /**
  * 
  * @author ShenHuaJie
@@ -28,7 +26,7 @@ public class RedisCacheManager implements CacheManager {
     /**
      * The Redis key prefix for caches 
      */
-    private String keyPrefix = Constants.CACHE_NAMESPACE + "shiro_redis_cache:";
+    private String keyPrefix = "IBASE4J-SHIRO-CACHE:";
 
     /**
      * Returns the Redis session keys
