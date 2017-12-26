@@ -6,6 +6,7 @@
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 	<!-- 这里主要是设置自定义的单Realm应用,若有多个Realm,可使用'realms'属性代替 -->
+	<bean id="sessionDAO" class="top.ibase4j.core.support.cache.shiro.RedisSessionDAO" />
 	<bean id="realm" class="org.ibase4j.core.shiro.Realm" />
 	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
 		<property name="realm" ref="realm" />
@@ -16,7 +17,6 @@
 		<property name="rememberMeManager" ref="rememberMeManager" />
 	</bean>
 	<bean id="sessionListener" class="top.ibase4j.core.listener.SessionListener" />
-	<bean id="sessionDAO" class="top.ibase4j.core.support.cache.shiro.RedisSessionDAO" />
 	<bean id="sessionManager"
 		class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
 		<property name="sessionDAO" ref="sessionDAO" />
