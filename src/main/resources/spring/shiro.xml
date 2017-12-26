@@ -10,7 +10,41 @@
 	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
 		<property name="realm" ref="realm" />
 		<property name="cacheManager">
-    		<bean class="top.ibase4j.core.support.cache.shiro.RedisCacheManager" />
+			<bean class="top.ibase4j.core.support.cache.shiro.RedisCacheManager" />
+		</property>
+		<property name="sessionManager" ref="sessionManager" />
+		<property name="rememberMeManager" ref="rememberMeManager" />
+	</bean>
+	<bean id="sessionListener" class="top.ibase4j.core.listener.SessionListener" />
+	<bean id="sessionDAO" class="top.ibase4j.core.support.cache.shiro.RedisSessionDAO" />
+	<bean id="sessionManager"
+		class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+		<property name="sessionDAO" ref="sessionDAO" />
+		<property name="sessionListeners">
+			<list>
+				<ref bean="sessionListener" />
+			</list>
+		</property>
+		<property name="sessionIdCookie">
+			<bean class="org.apache.shiro.web.servlet.SimpleCookie">
+				<property name="httpOnly" value="true" />
+				<property name="maxAge" value="-1" />
+				<property name="path" value="/" />
+				<property name="secure" value="${session.cookie.secure}" />
+			</bean>
+		</property>
+	</bean>
+	<!-- rememberMe管理器 -->
+	<bean id="rememberMeManager" class="org.apache.shiro.web.mgt.CookieRememberMeManager">
+		<property name="cookie">
+			<!-- rememberMe缓存cookie -->
+			<bean class="org.apache.shiro.web.servlet.SimpleCookie">
+				<constructor-arg value="rememberMe" />
+				<!-- 不会暴露给客户端 -->
+				<property name="httpOnly" value="true" />
+				<!-- 记住我cookie生效时间 -->
+				<property name="maxAge" value="${rememberMe.cookie.maxAge}" />
+			</bean>
 		</property>
 	</bean>
 	<!-- Web应用中,Shiro可控制的Web请求必须经过Shiro主过滤器的拦截,Shiro对基于Spring的Web应用提供了完美的支持 -->
@@ -48,4 +82,13 @@
 	</bean>
 	<!-- Shiro生命周期处理器 -->
 	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+	<!-- 开启Shiro Spring AOP权限注解@RequiresPermissions的支持 -->
+	<bean depends-on="lifecycleBeanPostProcessor"
+		class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator">
+		<property name="proxyTargetClass" value="true" />
+	</bean>
+	<bean
+		class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+		<property name="securityManager" ref="securityManager" />
+	</bean>
 </beans>
