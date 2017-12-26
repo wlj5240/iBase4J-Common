@@ -17,6 +17,7 @@ import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.apache.shiro.util.CollectionUtils;
 
+import top.ibase4j.core.Constants;
 import top.ibase4j.core.util.CacheUtil;
 
 /**
@@ -30,7 +31,7 @@ public class RedisCache<K, V> implements Cache<K, V> {
     /**
      * The Redis key prefix for the sessions 
      */
-    private String keyPrefix = "IBASE4J-SHIRO-CACHE:";
+    private String keyPrefix = Constants.SYSTEM_CACHE_NAMESPACE + "SHIRO-CACHE:";
 
     /**
      * Returns the Redis session keys

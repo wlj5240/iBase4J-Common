@@ -15,6 +15,7 @@ import org.springframework.data.redis.connection.RedisStringCommands.SetOption;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.types.Expiration;
 
+import top.ibase4j.core.Constants;
 import top.ibase4j.core.util.InstanceUtil;
 import top.ibase4j.core.util.PropertiesUtil;
 import top.ibase4j.core.util.SerializeUtil;
@@ -25,7 +26,7 @@ import top.ibase4j.core.util.SerializeUtil;
  * @version 2017年12月24日 下午8:53:39
  */
 public class RedisSessionDAO extends AbstractSessionDAO {
-    private static final String REDIS_SHIRO_SESSION = "IBASE4J-SHIRO-SESSION:";
+    private static final String REDIS_SHIRO_SESSION = Constants.SYSTEM_CACHE_NAMESPACE + "SHIRO-SESSION:";
     private static final int EXPIRE_TIME = 600;
     @Autowired
     private RedisTemplate<Serializable, Serializable> redisTemplate;

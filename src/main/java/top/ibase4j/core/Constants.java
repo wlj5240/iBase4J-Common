@@ -35,7 +35,9 @@ public interface Constants {
     /** 缓存命名空间 */
     static final String CACHE_NAMESPACE = "iBase4J:";
     /** 缓存命名空间 */
-    static final String SYSTEM_CACHE_NAMESPACE = "SYSTEM:iBase4J:";
+    static final String SYSTEM_CACHE_NAMESPACE = "S:iBase4J:";
+    /** 缓存命名空间 */
+    static final String CACHE_NAMESPACE_LOCK = "L:iBase4J:";
     /** 上次请求地址 */
     static final String PREREQUEST = CACHE_NAMESPACE + "PREREQUEST";
     /** 上次请求时间 */
@@ -48,7 +50,7 @@ public interface Constants {
     static final String TOKEN_KEY = SYSTEM_CACHE_NAMESPACE + "TOKEN_KEY";
     /***/
     static final String DB_KEY = "90139119";
-    
+
     /** 日志表状态 */
     interface JOBSTATE {
         /**
