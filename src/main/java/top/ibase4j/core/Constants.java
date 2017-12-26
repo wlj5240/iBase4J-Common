@@ -35,7 +35,7 @@ public interface Constants {
     /** 缓存命名空间 */
     static final String CACHE_NAMESPACE = "iBase4J:";
     /** 缓存命名空间 */
-    static final String SYSTEM_CACHE_NAMESPACE = "IBASE4J-";
+    static final String SYSTEM_CACHE_NAMESPACE = "SYSTEM:iBase4J:";
     /** 上次请求地址 */
     static final String PREREQUEST = CACHE_NAMESPACE + "PREREQUEST";
     /** 上次请求时间 */
