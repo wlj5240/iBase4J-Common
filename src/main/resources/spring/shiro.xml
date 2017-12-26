@@ -27,6 +27,7 @@
 		</property>
 		<property name="sessionIdCookie">
 			<bean class="org.apache.shiro.web.servlet.SimpleCookie">
+				<constructor-arg value="IBASE4JSESSIONID" />
 				<property name="httpOnly" value="true" />
 				<property name="maxAge" value="-1" />
 				<property name="path" value="/" />
