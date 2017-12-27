@@ -47,7 +47,7 @@
 		<motan.version>1.1.0</motan.version>
 		<!-- -->
 		<mail.version>1.6.0</mail.version>
-		<redisson.version>3.5.6</redisson.version>
+		<redisson.version>3.5.5</redisson.version>
 		<poi.version>3.17</poi.version>
 		<jxl.version>2.6.12</jxl.version>
 		<xfire.version>1.2.6</xfire.version>
@@ -110,9 +110,9 @@
 			<version>1.11</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-digester3</artifactId>
-			<version>3.2</version>
+			<groupId>commons-digester</groupId>
+			<artifactId>commons-digester</artifactId>
+			<version>2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-beanutils</groupId>

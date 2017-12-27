@@ -24,37 +24,41 @@ import top.ibase4j.core.base.Parameter;
 @Component
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 public class DataSourceAspect {
-    private final Logger logger = LogManager.getLogger();
+	private final Logger logger = LogManager.getLogger();
 
-    @Pointcut("this(top.ibase4j.core.base.BaseProviderImpl)")
-    public void aspect() {
-    }
+	@Pointcut("this(top.ibase4j.core.base.BaseProviderImpl)")
+	public void aspect() {
+	}
 
-    /**
-     * 配置前置通知,使用在方法aspect()上注册的切入点
-     */
-    @Before("aspect()")
-    public void before(JoinPoint point) {
-        Parameter parameter = (Parameter)point.getArgs()[0];
-        String method = parameter.getMethod();
-        try {
-            L: for (String key : ChooseDataSource.METHODTYPE.keySet()) {
-                for (String type : ChooseDataSource.METHODTYPE.get(key)) {
-                    if (method.startsWith(type)) {
-                        logger.info(key);
-                        HandleDataSource.putDataSource(key);
-                        break L;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            logger.error("", e);
-            HandleDataSource.putDataSource("write");
-        }
-    }
+	static {
+		System.setProperty("druid.logType", "log4j2");
+	}
 
-    @After("aspect()")
-    public void after(JoinPoint point) {
-        HandleDataSource.clear();
-    }
+	/**
+	 * 配置前置通知,使用在方法aspect()上注册的切入点
+	 */
+	@Before("aspect()")
+	public void before(JoinPoint point) {
+		Parameter parameter = (Parameter) point.getArgs()[0];
+		String method = parameter.getMethod();
+		try {
+			L: for (String key : ChooseDataSource.METHODTYPE.keySet()) {
+				for (String type : ChooseDataSource.METHODTYPE.get(key)) {
+					if (method.startsWith(type)) {
+						logger.info(key);
+						HandleDataSource.putDataSource(key);
+						break L;
+					}
+				}
+			}
+		} catch (Exception e) {
+			logger.error("", e);
+			HandleDataSource.putDataSource("write");
+		}
+	}
+
+	@After("aspect()")
+	public void after(JoinPoint point) {
+		HandleDataSource.clear();
+	}
 }
