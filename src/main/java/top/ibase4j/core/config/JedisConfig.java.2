@@ -1,0 +1,99 @@
+package top.ibase4j.core.config;
+
+import java.io.Serializable;
+import java.time.Duration;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.CacheManager;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.RedisClusterConfiguration;
+import org.springframework.data.redis.connection.RedisPassword;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisClientConfiguration.JedisClientConfigurationBuilder;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import com.alibaba.fastjson.support.spring.GenericFastJsonRedisSerializer;
+
+import redis.clients.jedis.JedisPoolConfig;
+import top.ibase4j.core.support.cache.RedisHelper;
+import top.ibase4j.core.util.InstanceUtil;
+import top.ibase4j.core.util.PropertiesUtil;
+
+@Configuration
+public class JedisConfig2 {
+    @Bean
+    public JedisPoolConfig jedisPoolConfig() {
+        JedisPoolConfig config = new JedisPoolConfig();
+        config.setMinIdle(PropertiesUtil.getInt("redis.minIdle"));
+        config.setMaxIdle(PropertiesUtil.getInt("redis.maxIdle"));
+        config.setMaxTotal(PropertiesUtil.getInt("redis.maxTotal"));
+        config.setMaxWaitMillis(PropertiesUtil.getInt("redis.maxWaitMillis"));
+        config.setTestOnBorrow(Boolean.valueOf(PropertiesUtil.getString("redis.testOnBorrow")));
+        return config;
+    }
+
+    @Bean
+    public JedisConnectionFactory jedisConnectionFactory(JedisPoolConfig jedisPoolConfig) {
+        JedisConnectionFactory jedisConnectionFactory;
+        String nodes = PropertiesUtil.getString("redis.cluster.nodes");
+        JedisClientConfigurationBuilder builder = JedisClientConfiguration.builder();
+        Duration connectTimeout = Duration.ofSeconds(PropertiesUtil.getInt("redis.connectTimeout"));
+        Duration readTimeout = Duration.ofSeconds(PropertiesUtil.getInt("redis.readTimeout"));
+        JedisClientConfiguration clientConfiguration = builder.connectTimeout(connectTimeout).readTimeout(readTimeout)
+            .usePooling().poolConfig(jedisPoolConfig).build();
+        RedisPassword password = RedisPassword.of(PropertiesUtil.getString("redis.password"));
+        if (StringUtils.isNotBlank(nodes)) {
+            List<String> list = InstanceUtil.newArrayList(nodes.split(","));
+            RedisClusterConfiguration configuration = new RedisClusterConfiguration(list);
+            configuration.setMaxRedirects(PropertiesUtil.getInt("redis.cluster.max-redirects"));
+            configuration.setPassword(password);
+            jedisConnectionFactory = new JedisConnectionFactory(configuration, clientConfiguration);
+        } else {
+            RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
+            configuration.setPassword(password);
+            configuration.setHostName(PropertiesUtil.getString("redis.host"));
+            configuration.setPort(PropertiesUtil.getInt("redis.port"));
+            jedisConnectionFactory = new JedisConnectionFactory(configuration, clientConfiguration);
+        }
+        return jedisConnectionFactory;
+    }
+
+    @Bean
+    public RedisTemplate<?, ?> redisTemplate(JedisConnectionFactory jedisConnectionFactory) {
+        RedisTemplate<Serializable, Serializable> redisTemplate = new RedisTemplate<Serializable, Serializable>();
+        StringRedisSerializer keySerializer = new StringRedisSerializer();
+        GenericFastJsonRedisSerializer valueSerializer = new GenericFastJsonRedisSerializer();
+        redisTemplate.setEnableTransactionSupport(new Boolean(PropertiesUtil.getString("redis.enableTransaction")));
+        redisTemplate.setConnectionFactory(jedisConnectionFactory);
+        redisTemplate.setKeySerializer(keySerializer);
+        redisTemplate.setValueSerializer(valueSerializer);
+        redisTemplate.setHashKeySerializer(keySerializer);
+        redisTemplate.setHashValueSerializer(valueSerializer);
+        return redisTemplate;
+    }
+
+    @Bean
+    @Qualifier("redisTemplate")
+    public RedisHelper redisHelper(RedisTemplate<Serializable, Serializable> redisTemplate) {
+        RedisHelper redisHelper = new RedisHelper();
+        redisHelper.setRedisTemplate(redisTemplate);
+        return redisHelper;
+    }
+
+    @Bean
+    public CacheManager redisCacheManager(JedisConnectionFactory connectionFactory) {
+        RedisCacheConfiguration configuration = RedisCacheConfiguration.defaultCacheConfig()
+            .entryTtl(Duration.ofSeconds(PropertiesUtil.getInt("redis.expiration", 10)));
+        RedisCacheManager cacheManager = RedisCacheManager.builder(connectionFactory).cacheDefaults(configuration)
+            .transactionAware().build();
+        return cacheManager;
+    }
+}
