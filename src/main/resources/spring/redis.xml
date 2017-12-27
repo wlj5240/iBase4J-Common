@@ -36,7 +36,7 @@
 	<bean id="keySerializer"
 		class="org.springframework.data.redis.serializer.StringRedisSerializer" />
 	<bean id="valueSerializer"
-		class="org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer" />
+		class="com.alibaba.fastjson.support.spring.GenericFastJsonRedisSerializer" />
 	<!-- 缓存 -->
 	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
 		<property name="connectionFactory" ref="jedisConnectionFactory" />

@@ -12,8 +12,9 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import com.alibaba.fastjson.support.spring.GenericFastJsonRedisSerializer;
 
 import redis.clients.jedis.JedisPoolConfig;
 import top.ibase4j.core.support.cache.RedisHelper;
@@ -57,7 +58,7 @@ public class JedisConfig {
     public RedisTemplate<?, ?> redisTemplate(JedisConnectionFactory jedisConnectionFactory) {
         RedisTemplate<Serializable, Serializable> redisTemplate = new RedisTemplate<Serializable, Serializable>();
         StringRedisSerializer keySerializer = new StringRedisSerializer();
-        GenericJackson2JsonRedisSerializer valueSerializer = new GenericJackson2JsonRedisSerializer();
+        GenericFastJsonRedisSerializer valueSerializer = new GenericFastJsonRedisSerializer();
         redisTemplate.setEnableTransactionSupport(new Boolean(PropertiesUtil.getString("redis.enableTransaction")));
         redisTemplate.setConnectionFactory(jedisConnectionFactory);
         redisTemplate.setKeySerializer(keySerializer);
