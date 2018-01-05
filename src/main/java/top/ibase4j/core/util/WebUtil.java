@@ -156,6 +156,7 @@ public final class WebUtil {
 			}
 			if (StringUtils.isNotBlank(wholeStr)) {
 				logger.info("request===>" + wholeStr);
+                request.setAttribute("iBase4J.Parameters", wholeStr);
 				try {
 					return JSON.parseObject(wholeStr, Map.class);
 				} catch (Exception e) {
@@ -178,6 +179,7 @@ public final class WebUtil {
 			}
 			if (StringUtils.isNotBlank(wholeStr)) {
 				logger.info("request===>" + wholeStr);
+                request.setAttribute("iBase4J.Parameters", wholeStr);
 				return InstanceUtil.parse(wholeStr, cls);
 			}
 		} catch (Exception e) {
@@ -203,6 +205,7 @@ public final class WebUtil {
 					T t = (T) InstanceUtil.transMap2Bean((Map) map, cls);
 					resultList.add(t);
 				}
+				request.setAttribute("iBase4J.Parameters", resultList);
 				return resultList;
 			}
 		} catch (Exception e) {

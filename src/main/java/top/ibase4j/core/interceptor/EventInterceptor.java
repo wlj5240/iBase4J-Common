@@ -66,7 +66,12 @@ public class EventInterceptor extends BaseInterceptor {
                         record.setParameters("");
                     } else {
                         String param = JSON.toJSONString(WebUtil.getParameterMap(request));
-                        record.setParameters(param.length() > 1024 ? param.substring(0, 1024) : param);
+                        Object parameters = request.getAttribute("iBase4J.Parameters");
+                        if ("{}".equals(param) && parameters != null) {
+                            param = JSON.toJSONString(parameters);
+                            request.removeAttribute("iBase4J.Parameters");
+                        }
+                        record.setParameters(param);
                     }
                     record.setStatus(response.getStatus());
                     if (uid != null) {
