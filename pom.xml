@@ -42,7 +42,7 @@
 		<log4j.version>2.9.1</log4j.version>
 		<!-- -->
 		<druid.version>1.1.6</druid.version>
-		<dubbo.version>2.5.7</dubbo.version>
+		<dubbo.version>2.5.8</dubbo.version>
 		<fastjson.version>1.2.44</fastjson.version>
 		<motan.version>1.1.0</motan.version>
 		<!-- -->
@@ -533,6 +533,7 @@
 						<artifactId>maven-release-plugin</artifactId>
 						<version>2.5</version>
 						<configuration>
+							<encoding>UTF-8</encoding>
 							<autoVersionSubmodules>true</autoVersionSubmodules>
 							<useReleaseProfile>false</useReleaseProfile>
 							<releaseProfiles>release</releaseProfiles>
@@ -544,6 +545,9 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
 						<version>2.2.1</version>
+						<configuration>
+							<encoding>UTF-8</encoding>
+						</configuration>
 						<executions>
 							<execution>
 								<phase>package</phase>
@@ -558,6 +562,9 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
 						<version>2.9.1</version>
+						<configuration>
+							<encoding>UTF-8</encoding>
+						</configuration>
 						<executions>
 							<execution>
 								<phase>package</phase>
