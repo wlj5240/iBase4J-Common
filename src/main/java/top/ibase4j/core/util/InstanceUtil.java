@@ -68,11 +68,13 @@ public final class InstanceUtil {
                 if (!key.equals("class") && propertyMap.containsKey(key)) {
                     Method getter = propertyMap.get(key).getReadMethod();
                     Method setter = property.getWriteMethod();
+                    Object value = "";
                     try {
-                        Object value = TypeParseUtil.convert(getter.invoke(orig), property.getPropertyType(), null);
+                        value = getter.invoke(orig);
+                        value = TypeParseUtil.convert(value, property.getPropertyType(), null);
                         setter.invoke(bean, value);
                     } catch (Exception e) {
-                        logger.error("to Error " + e);
+                        logger.error("to Error " + key + ":" + value + ">" + e);
                     }
                 }
             }
