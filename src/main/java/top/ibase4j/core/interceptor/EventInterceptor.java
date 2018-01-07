@@ -29,7 +29,8 @@ import top.ibase4j.model.SysEvent;
  * @version 2016年6月14日 下午6:18:46
  */
 public class EventInterceptor extends BaseInterceptor {
-    private final ThreadLocal<Long> startTimeThreadLocal = new NamedThreadLocal<Long>("ThreadLocal StartTime");
+    private final ThreadLocal<Long> startTimeThreadLocal = new NamedThreadLocal<Long>("ThreadLocalStartTime");
+    private final ThreadLocal<Object> currentUserThreadLocal = new NamedThreadLocal<Object>("ThreadLocalCurrentUser");
     private ExecutorService executorService = Executors.newCachedThreadPool();
 
     @Autowired
@@ -38,9 +39,17 @@ public class EventInterceptor extends BaseInterceptor {
 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
         throws Exception {
-        logger.info("URI [" + request.getServletPath() + "] request start...");
+        String path = request.getServletPath();
+        logger.info("URI [" + path + "] request start...");
         // 开始时间（该数据只有当前请求的线程可见）
         startTimeThreadLocal.set(System.currentTimeMillis());
+        if (!path.contains("login")) {
+            try {
+                currentUserThreadLocal.set(WebUtil.getCurrentUser(request));
+            } catch (Throwable e) {
+                logger.error("", e);
+            }
+        }
         return super.preHandle(request, response, handler);
     }
 
@@ -52,7 +61,8 @@ public class EventInterceptor extends BaseInterceptor {
         // 保存日志
         if (handler instanceof HandlerMethod) {
             try {
-                Object uid = WebUtil.getCurrentUser(request);
+                Object uid = currentUserThreadLocal.get();
+                uid = uid == null ? WebUtil.getCurrentUser(request) : uid;
                 String userAgent = request.getHeader("USER-AGENT");
                 String clientIp = WebUtil.getHost(request);
                 if (!path.contains("/read/") && !path.contains("/get") && !path.contains("/unauthorized")
@@ -107,11 +117,12 @@ public class EventInterceptor extends BaseInterceptor {
                 } else if (path.contains("/unauthorized")) {
                     logger.warn("The user [{}] no login", clientIp + "@" + userAgent);
                 } else if (path.contains("/forbidden")) {
-                    logger.warn("The user [{}] no promission", WebUtil.getCurrentUser() + "@" + clientIp + "@" + userAgent);
+                    logger.warn("The user [{}] no promission",
+                        WebUtil.getCurrentUser() + "@" + clientIp + "@" + userAgent);
                 } else {
                     logger.info(uid + "@" + path + "@" + clientIp + userAgent);
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.error("", e);
             }
         }
