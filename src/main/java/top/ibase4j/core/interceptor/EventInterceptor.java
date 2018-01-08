@@ -61,10 +61,13 @@ public class EventInterceptor extends BaseInterceptor {
         // 保存日志
         if (handler instanceof HandlerMethod) {
             try {
-                Object uid = currentUserThreadLocal.get();
-                uid = uid == null ? WebUtil.getCurrentUser(request) : uid;
                 String userAgent = request.getHeader("USER-AGENT");
                 String clientIp = WebUtil.getHost(request);
+                Object uid = null;
+                if (!path.contains("login")) {
+                    uid = currentUserThreadLocal.get();
+                }
+                uid = uid == null ? WebUtil.getCurrentUser(request) : uid;
                 if (!path.contains("/read/") && !path.contains("/get") && !path.contains("/unauthorized")
                     && !path.contains("/forbidden")) {
                     final SysEvent record = new SysEvent();
