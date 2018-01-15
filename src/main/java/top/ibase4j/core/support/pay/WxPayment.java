@@ -46,7 +46,7 @@ public class WxPayment {
     public static Map<String, String> buildUnifiedOrderParasMap(String appid, String sub_appid, String mch_id,
         String sub_mch_id, String device_info, String body, String detail, String attach, String out_trade_no,
         String total_fee, String spbill_create_ip, String notify_url, String trade_type, String paternerKey,
-        String product_id, String scene_info) {
+        String product_id, String scene_info, String openid) {
         Map<String, String> params = new HashMap<String, String>();
         params.put("appid", appid);
         params.put("sub_appid", sub_appid);
@@ -64,6 +64,7 @@ public class WxPayment {
         params.put("trade_type", trade_type);
         params.put("product_id", product_id);
         params.put("scene_info", scene_info);
+        params.put("openid", openid);
 
         return buildSignAfterParasMap(params, paternerKey);
     }

@@ -40,8 +40,8 @@ public class WeChatUtil {
      * @return 支付参数
      */
     public static Map<String, String> pushOrder(String out_trade_no, String body, String detail, BigDecimal amount,
-        String scene_info, String ip, String callBack) {
-        return pushOrder("APP", out_trade_no, body, detail, amount, scene_info, ip, callBack);
+        String scene_info, String ip, String callBack, String openId) {
+        return pushOrder("APP", out_trade_no, body, detail, amount, scene_info, ip, callBack, openId);
     }
 
     /**
@@ -57,10 +57,10 @@ public class WeChatUtil {
      * @return 支付参数
      */
     public static Map<String, String> pushOrder(String trade_type, String out_trade_no, String body, String detail,
-        BigDecimal amount, String scene_info, String ip, String callBack) {
+        BigDecimal amount, String scene_info, String ip, String callBack, String openId) {
         return pushOrder(PropertiesUtil.getString("wx.mch_id"), PropertiesUtil.getString("wx.appId"),
             PropertiesUtil.getString("wx.partnerKey"), trade_type, out_trade_no, body, detail, amount, scene_info, ip,
-            callBack);
+            callBack, openId);
     }
 
     /**
@@ -80,10 +80,10 @@ public class WeChatUtil {
      */
     public static Map<String, String> pushOrder(String mch_id, String appId, String partnerKey, String trade_type,
         String out_trade_no, String body, String detail, BigDecimal amount, String scene_info, String ip,
-        String callBack) {
+        String callBack, String openId) {
         String total_fee = amount.multiply(new BigDecimal("100")).setScale(0).toString();
         Map<String, String> params = WxPayment.buildUnifiedOrderParasMap(appId, null, mch_id, null, null, body, detail,
-            null, out_trade_no, total_fee, ip, callBack, trade_type, partnerKey, null, scene_info);
+            null, out_trade_no, total_fee, ip, callBack, trade_type, partnerKey, null, scene_info, openId);
         logger.info("WeChart order parameter : " + JSON.toJSONString(params));
         String result = WxPay.pushOrder(params);
         logger.info("WeChart order result : " + result);
