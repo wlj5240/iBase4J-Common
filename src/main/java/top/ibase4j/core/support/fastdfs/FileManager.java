@@ -15,7 +15,6 @@ import org.csource.fastdfs.TrackerClient;
 import org.csource.fastdfs.TrackerServer;
 import org.csource.fastdht.FastDHTClient;
 import org.csource.fastdht.KeyInfo;
-import org.springframework.core.io.DefaultResourceLoader;
 
 import com.alibaba.fastjson.JSON;
 
@@ -37,10 +36,9 @@ public class FileManager implements Config {
 
     static { // Initialize Fast DFS Client configurations
         try {
-            String path = new DefaultResourceLoader().getResource("classpath:fdfs_client.conf").getFile()
-                .getParentFile().getAbsolutePath();
-            ClientGlobal.init(path + "\\fdfs_client.conf");
-            org.csource.fastdht.ClientGlobal.init(path + "\\fdht_client.conf");
+            String path = FileManager.class.getResource("/").toString().replace("file:", "");
+            ClientGlobal.init(path + "fdfs_client.conf");
+            org.csource.fastdht.ClientGlobal.init(path + "fdht_client.conf");
         } catch (Exception e) {
             logger.error("", e);
         }
