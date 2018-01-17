@@ -96,25 +96,6 @@ public class WxPayment {
     }
 
     /**
-     * 构建支付参数
-     * 
-     * @param appid
-     * @return
-     */
-    public static String buildOrderPaySign(String appid, String partnerid, String prepayid, String packages,
-        String timestamp, String noncestr, String paternerKey) {
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("appid", appid);
-        params.put("partnerid", partnerid);
-        params.put("prepayid", prepayid);
-        params.put("package", packages);
-        params.put("timestamp", timestamp);
-        params.put("noncestr", noncestr);
-        String sign = WxPayment.createSign(params, paternerKey);
-        return sign;
-    }
-
-    /**
      * 构建短链接参数
      * 
      * @param appid
@@ -155,9 +136,9 @@ public class WxPayment {
      * @param paternerKey
      * @return
      */
-    public static Map<String, String> buildRefundParams(String appid, String mch_id, String sub_appid, String sub_mch_id,
-        String transaction_id, String out_trade_no, String out_refund_no, String total_fee, String refund_fee,
-        String refund_fee_type, String refund_account, String refund_desc, String paternerKey) {
+    public static Map<String, String> buildRefundParams(String appid, String mch_id, String sub_appid,
+        String sub_mch_id, String transaction_id, String out_trade_no, String out_refund_no, String total_fee,
+        String refund_fee, String refund_fee_type, String refund_account, String refund_desc, String paternerKey) {
         Map<String, String> params = new HashMap<String, String>();
         params.put("appid", appid);
         params.put("mch_id", mch_id);

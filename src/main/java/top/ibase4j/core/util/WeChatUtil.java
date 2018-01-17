@@ -14,7 +14,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.toolkit.IdWorker;
 
 import top.ibase4j.core.support.pay.WxPay;
 import top.ibase4j.core.support.pay.WxPayment;
@@ -29,7 +28,7 @@ public class WeChatUtil {
     private static final Logger logger = LogManager.getLogger();
 
     /**
-     * APP下单并获取支付签名
+     * APP下单
      * @param out_trade_no 商户订单号
      * @param body 商品描述
      * @param detail 交易详情
@@ -45,8 +44,8 @@ public class WeChatUtil {
     }
 
     /**
-     * 下单并获取支付签名
-     * @param trade_type 交易类型(APP/MWEB)
+     * 下单
+     * @param trade_type 交易类型(APP/MWEB/JSAPI)
      * @param out_trade_no 商户订单号
      * @param body 商品描述
      * @param detail 商品详细描述
@@ -64,7 +63,7 @@ public class WeChatUtil {
     }
 
     /**
-     * 下单并获取支付签名
+     * 下单
      * @param mch_id 商户号
      * @param appId APPID
      * @param partnerKey 安全密钥
@@ -98,16 +97,11 @@ public class WeChatUtil {
                     String prepay_id = resultMap.get("prepay_id");
                     String mweb_url = resultMap.get("mweb_url");
                     resultMap.clear();
-                    resultMap.put("appid", appId);
-                    resultMap.put("partnerid", mch_id);
                     resultMap.put("prepayid", prepay_id);
                     resultMap.put("tradeType", trade_type);
-                    resultMap.put("mwebUrl", mweb_url);
-                    resultMap.put("timestamp", String.valueOf(System.currentTimeMillis() / 1000));
-                    resultMap.put("noncestr", IdWorker.get32UUID());
-                    sign = WxPayment.buildOrderPaySign(appId, mch_id, prepay_id, "Sign=WXPay",
-                        resultMap.get("timestamp"), resultMap.get("noncestr"), partnerKey);
-                    resultMap.put("sign", sign);
+                    if (DataUtil.isNotEmpty(mweb_url)) {
+                        resultMap.put("mwebUrl", mweb_url);
+                    }
                     return resultMap;
                 } else {
                     throw new RuntimeException("微信返回数据异常.");
