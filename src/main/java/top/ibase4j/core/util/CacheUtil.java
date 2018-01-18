@@ -52,14 +52,14 @@ public class CacheUtil {
         if (CacheUtil.getLock(key + "-LOCK")) {
             try {
                 Integer times = 1;
-                String timesStr = (String)CacheUtil.getCache().get(key);
+                String timesStr = (String)CacheUtil.getLockManager().get(key);
                 if (StringUtils.isNotBlank(timesStr)) {
                     times = Integer.valueOf(timesStr) + 1;
                     if (times > frequency) {
                         throw new BusinessException(message);
                     }
                 }
-                CacheUtil.getCache().set(key, times.toString(), seconds);
+                CacheUtil.getLockManager().set(key, times.toString(), seconds);
             } finally {
                 CacheUtil.unlock(key + "-LOCK");
             }
