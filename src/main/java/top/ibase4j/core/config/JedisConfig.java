@@ -59,6 +59,7 @@ public class JedisConfig {
         RedisTemplate<Serializable, Serializable> redisTemplate = new RedisTemplate<Serializable, Serializable>();
         StringRedisSerializer keySerializer = new StringRedisSerializer();
         GenericFastJsonRedisSerializer valueSerializer = new GenericFastJsonRedisSerializer();
+        //GenericJackson2JsonRedisSerializer valueSerializer = new GenericJackson2JsonRedisSerializer();
         redisTemplate.setEnableTransactionSupport(PropertiesUtil.getBoolean("redis.enableTransaction", false));
         redisTemplate.setConnectionFactory(jedisConnectionFactory);
         redisTemplate.setKeySerializer(keySerializer);
