@@ -1,7 +1,5 @@
 package top.ibase4j.core.util;
 
-import org.apache.commons.lang3.StringUtils;
-
 import top.ibase4j.core.exception.BusinessException;
 import top.ibase4j.core.support.cache.CacheManager;
 
@@ -49,19 +47,19 @@ public class CacheUtil {
      * @param message 超出次数提示信息
      */
     public static void refreshTimes(String key, int seconds, int frequency, String message) {
-        if (CacheUtil.getLock(key + "-LOCK")) {
+        if (getLock(key + "-LOCK")) {
             try {
                 Integer times = 1;
-                String timesStr = (String)CacheUtil.getLockManager().get(key);
-                if (StringUtils.isNotBlank(timesStr)) {
+                String timesStr = (String)lockManager.get(key);
+                if (DataUtil.isNotEmpty(timesStr)) {
                     times = Integer.valueOf(timesStr) + 1;
                     if (times > frequency) {
                         throw new BusinessException(message);
                     }
                 }
-                CacheUtil.getLockManager().set(key, times.toString(), seconds);
+                lockManager.set(key, times.toString(), seconds);
             } finally {
-                CacheUtil.unlock(key + "-LOCK");
+                unlock(key + "-LOCK");
             }
         } else {
             refreshTimes(key, seconds, frequency, message);
