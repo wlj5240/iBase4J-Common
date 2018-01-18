@@ -204,8 +204,8 @@ public class SchedulerManager implements InitializingBean {
     // 暂停任务
     public void stopJob(TaskScheduled scheduleJob) {
         try {
-            JobKey jobKey = JobKey.jobKey(scheduleJob.getTaskName(), scheduleJob.getTaskGroup());
-            scheduler.pauseJob(jobKey);
+            TriggerKey triggerKey = TriggerKey.triggerKey(scheduleJob.getTaskName(), scheduleJob.getTaskGroup());
+            scheduler.pauseTrigger(triggerKey);
         } catch (Exception e) {
             logger.error("Try to stop Job cause error : ", e);
             throw new BusinessException(e);
@@ -215,8 +215,8 @@ public class SchedulerManager implements InitializingBean {
     // 启动任务
     public void resumeJob(TaskScheduled scheduleJob) {
         try {
-            JobKey jobKey = JobKey.jobKey(scheduleJob.getTaskName(), scheduleJob.getTaskGroup());
-            scheduler.resumeJob(jobKey);
+            TriggerKey triggerKey = TriggerKey.triggerKey(scheduleJob.getTaskName(), scheduleJob.getTaskGroup());
+            scheduler.resumeTrigger(triggerKey);
         } catch (Exception e) {
             logger.error("Try to resume Job cause error : ", e);
             throw new BusinessException(e);
