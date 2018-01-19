@@ -312,4 +312,32 @@ public class WxPayment {
         }
         return str;
     }
+
+    /**
+     * @param appId
+     * @param mch_id
+     * @param prepay_id
+     * @param trade_type
+     * @param string
+     * @param string2
+     * @param partnerKey
+     * @return
+     */
+    public static String buildOrderPaySign(String appid, String partnerid, String prepayid, String trade_type,
+        String timestamp, String noncestr, String partnerKey) {
+        Map<String, String> params = new HashMap<String, String>();
+        if ("APP".equals(trade_type)) {
+            params.put("partnerId", partnerid);
+            params.put("prepayId", prepayid);
+            params.put("package", "Sign=WXPay");
+        } else if ("JSAPI".equals(trade_type)) {
+            params.put("appId", appid);
+            params.put("signType", "MD5");
+            params.put("package", "prepay_id=" + prepayid);
+        }
+        params.put("timeStamp", timestamp);
+        params.put("nonceStr", noncestr);
+        String sign = WxPayment.createSign(params, partnerKey);
+        return sign;
+    }
 }
