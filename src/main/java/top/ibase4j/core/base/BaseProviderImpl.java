@@ -9,7 +9,6 @@ import org.springframework.context.ApplicationContextAware;
 import com.alibaba.fastjson.JSON;
 
 import top.ibase4j.core.Constants;
-import top.ibase4j.core.util.ExceptionUtil;
 import top.ibase4j.core.util.InstanceUtil;
 
 public abstract class BaseProviderImpl implements ApplicationContextAware, BaseProvider {
@@ -32,8 +31,21 @@ public abstract class BaseProviderImpl implements ApplicationContextAware, BaseP
             logger.info("{} response：{}", no, JSON.toJSONString(response));
             return response;
         } catch (Exception e) {
-            String msg = ExceptionUtil.getStackTraceAsString(e);
-            logger.error(no + " " + Constants.Exception_Head + msg, e);
+            logger.error(no + " " + Constants.Exception_Head, e);
+            throw e;
+        }
+    }
+
+    public Object execute(String service, String method, Object... parameters) {
+        logger.info("{}.{} request：{}", service, method, JSON.toJSONString(parameters));
+        Object owner = applicationContext.getBean(service);
+        try {
+            Object result = InstanceUtil.invokeMethod(owner, method, parameters);
+            Parameter response = new Parameter(result);
+            logger.info("{}.{} response：{}", service, method, JSON.toJSONString(response));
+            return response;
+        } catch (Exception e) {
+            logger.error(service + "." + method + " " + Constants.Exception_Head, e);
             throw e;
         }
     }

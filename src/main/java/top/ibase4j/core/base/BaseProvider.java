@@ -6,4 +6,6 @@ package top.ibase4j.core.base;
  */
 public interface BaseProvider {
 	Parameter execute(Parameter parameter);
+	
+	Object execute(String service, String method, Object...parameters);
 }
