@@ -85,20 +85,6 @@ public class MybatisRedisCache extends PerpetualCache {
     }
 
     @Override
-    public int getSize() {
-        RedisTemplate<Serializable, Serializable> redisTemplate = ((RedisHelper)CacheUtil.getCache())
-            .getRedisTemplate();
-        RedisConnectionFactory factory = redisTemplate.getConnectionFactory();
-        RedisConnection conn = null;
-        try {
-            conn = RedisConnectionUtils.getConnection(factory);
-            return conn.dbSize().intValue();
-        } finally {
-            RedisConnectionUtils.releaseConnection(conn, factory);
-        }
-    }
-
-    @Override
     public ReadWriteLock getReadWriteLock() {
         return this.readWriteLock;
     }
