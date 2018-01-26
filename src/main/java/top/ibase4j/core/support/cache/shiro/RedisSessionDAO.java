@@ -11,7 +11,9 @@ import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.session.mgt.eis.AbstractSessionDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStringCommands.SetOption;
+import org.springframework.data.redis.core.RedisConnectionUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.types.Expiration;
 
@@ -30,10 +32,6 @@ public class RedisSessionDAO extends AbstractSessionDAO {
     @Autowired
     private RedisTemplate<Serializable, Serializable> redisTemplate;
 
-    private RedisConnection getRedisConnection() {
-        return redisTemplate.getConnectionFactory().getConnection();
-    }
-
     public void update(Session session) throws UnknownSessionException {
         saveSession(session);
     }
@@ -42,11 +40,13 @@ public class RedisSessionDAO extends AbstractSessionDAO {
         if (session != null) {
             Serializable id = session.getId();
             if (id != null) {
-                RedisConnection redisConnection = getRedisConnection();
+                RedisConnectionFactory factory = redisTemplate.getConnectionFactory();
+                RedisConnection conn = null;
                 try {
-                    redisConnection.del(buildRedisSessionKey(id));
+                    conn = RedisConnectionUtils.getConnection(factory);
+                    conn.del(buildRedisSessionKey(id));
                 } finally {
-                    redisConnection.close();
+                    RedisConnectionUtils.releaseConnection(conn, factory);
                 }
             }
         }
@@ -54,14 +54,16 @@ public class RedisSessionDAO extends AbstractSessionDAO {
 
     public Collection<Session> getActiveSessions() {
         List<Session> list = InstanceUtil.newArrayList();
-        RedisConnection redisConnection = getRedisConnection();
+        RedisConnectionFactory factory = redisTemplate.getConnectionFactory();
+        RedisConnection conn = null;
         try {
-            Set<byte[]> set = redisConnection.keys((Constants.REDIS_SHIRO_SESSION + "*").getBytes());
+            conn = RedisConnectionUtils.getConnection(factory);
+            Set<byte[]> set = conn.keys((Constants.REDIS_SHIRO_SESSION + "*").getBytes());
             for (byte[] key : set) {
-                list.add(SerializeUtil.deserialize(redisConnection.get(key), SimpleSession.class));
+                list.add(SerializeUtil.deserialize(conn.get(key), SimpleSession.class));
             }
         } finally {
-            redisConnection.close();
+            RedisConnectionUtils.releaseConnection(conn, factory);
         }
         return list;
     }
@@ -69,11 +71,13 @@ public class RedisSessionDAO extends AbstractSessionDAO {
     public void delete(Serializable sessionId) {
         if (sessionId != null) {
             byte[] sessionKey = buildRedisSessionKey(sessionId);
-            RedisConnection redisConnection = getRedisConnection();
+            RedisConnectionFactory factory = redisTemplate.getConnectionFactory();
+            RedisConnection conn = null;
             try {
-                redisConnection.del(sessionKey);
+                conn = RedisConnectionUtils.getConnection(factory);
+                conn.del(sessionKey);
             } finally {
-                redisConnection.close();
+                RedisConnectionUtils.releaseConnection(conn, factory);
             }
         }
     }
@@ -87,16 +91,18 @@ public class RedisSessionDAO extends AbstractSessionDAO {
 
     protected Session doReadSession(Serializable sessionId) {
         byte[] sessionKey = buildRedisSessionKey(sessionId);
-        RedisConnection redisConnection = getRedisConnection();
+        RedisConnectionFactory factory = redisTemplate.getConnectionFactory();
+        RedisConnection conn = null;
         try {
-            byte[] value = redisConnection.get(sessionKey);
+            conn = RedisConnectionUtils.getConnection(factory);
+            byte[] value = conn.get(sessionKey);
             if (value == null) {
                 return null;
             }
             Session session = SerializeUtil.deserialize(value, SimpleSession.class);
             return session;
         } finally {
-            redisConnection.close();
+            RedisConnectionUtils.releaseConnection(conn, factory);
         }
     }
 
@@ -105,11 +111,13 @@ public class RedisSessionDAO extends AbstractSessionDAO {
         byte[] sessionKey = buildRedisSessionKey(session.getId());
         int sessionTimeOut = PropertiesUtil.getInt("session.maxInactiveInterval", EXPIRE_TIME);
         byte[] value = SerializeUtil.serialize(session);
-        RedisConnection redisConnection = getRedisConnection();
+        RedisConnectionFactory factory = redisTemplate.getConnectionFactory();
+        RedisConnection conn = null;
         try {
-            redisConnection.set(sessionKey, value, Expiration.seconds(sessionTimeOut), SetOption.UPSERT);
+            conn = RedisConnectionUtils.getConnection(factory);
+            conn.set(sessionKey, value, Expiration.seconds(sessionTimeOut), SetOption.UPSERT);
         } finally {
-            redisConnection.close();
+            RedisConnectionUtils.releaseConnection(conn, factory);
         }
     }
 

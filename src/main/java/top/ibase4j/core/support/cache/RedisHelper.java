@@ -34,6 +34,10 @@ public final class RedisHelper implements CacheManager {
         this.valueSerializer = (RedisSerializer<Object>)redisTemplate.getValueSerializer();
         CacheUtil.setCacheManager(this);
     }
+    
+    public RedisTemplate<Serializable, Serializable> getRedisTemplate() {
+        return redisTemplate;
+    }
 
     @Override
     public final Object get(final String key) {
