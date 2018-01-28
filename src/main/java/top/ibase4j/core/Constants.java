@@ -51,7 +51,7 @@ public interface Constants {
 	/** SESSION */
 	static final String REDIS_SHIRO_SESSION = SYSTEM_CACHE_NAMESPACE + "SHIRO-SESSION:";
 	/** CACHE */
-	static final String MYBATIS_CACHE = SYSTEM_CACHE_NAMESPACE + "MYBATIS:";
+	static final String MYBATIS_CACHE = "D:iBase4J:MYBATIS:";
 	/***/
 	static final String DB_KEY = "90139119";
 
