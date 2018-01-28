@@ -11,8 +11,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mybatis.caches.ehcache.AbstractEhcacheCache;
 
-import com.alibaba.fastjson.JSON;
-
 import top.ibase4j.core.Constants;
 import top.ibase4j.core.util.CacheUtil;
 import top.ibase4j.core.util.SecurityUtil;
@@ -60,7 +58,7 @@ public class EhcacheRedisCache extends AbstractEhcacheCache {
 	}
 
 	private String getKey(Object key) {
-		return Constants.MYBATIS_CACHE + SecurityUtil.encryptPassword(id + JSON.toJSONString(key));
+		return Constants.MYBATIS_CACHE + SecurityUtil.encryptPassword(id + key.hashCode());
 	}
 
 	@Override
