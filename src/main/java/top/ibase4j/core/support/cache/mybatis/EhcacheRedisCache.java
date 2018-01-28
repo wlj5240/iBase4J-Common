@@ -10,16 +10,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mybatis.caches.ehcache.AbstractEhcacheCache;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisStringCommands.SetOption;
-import org.springframework.data.redis.core.RedisConnectionUtils;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.types.Expiration;
 
-import top.ibase4j.core.support.cache.RedisHelper;
+import com.alibaba.fastjson.JSON;
+
+import top.ibase4j.core.Constants;
 import top.ibase4j.core.util.CacheUtil;
-import top.ibase4j.core.util.SerializeUtil;
+import top.ibase4j.core.util.SecurityUtil;
 
 /**
  * 二级缓存
@@ -45,17 +41,7 @@ public class EhcacheRedisCache extends AbstractEhcacheCache {
 	public void putObject(Object key, Object value) {
 		if (value != null) {
 			super.putObject(key, value);
-			RedisTemplate<Serializable, Serializable> redisTemplate = ((RedisHelper) CacheUtil.getCache())
-					.getRedisTemplate();
-			RedisConnectionFactory factory = redisTemplate.getConnectionFactory();
-			RedisConnection conn = null;
-			try {
-				conn = RedisConnectionUtils.getConnection(factory);
-				conn.set(SerializeUtil.serialize(key), SerializeUtil.serialize(value), Expiration.seconds(60 * 60),
-						SetOption.ifPresent());
-			} finally {
-				RedisConnectionUtils.releaseConnection(conn, factory);
-			}
+			CacheUtil.getLockManager().set(getKey(key), (Serializable) value, 60 * 60);
 		}
 	}
 
@@ -68,24 +54,13 @@ public class EhcacheRedisCache extends AbstractEhcacheCache {
 		if (result != null) {
 			return result;
 		}
-		RedisTemplate<Serializable, Serializable> redisTemplate = ((RedisHelper) CacheUtil.getCache())
-				.getRedisTemplate();
-		RedisConnectionFactory factory = redisTemplate.getConnectionFactory();
-		RedisConnection conn = null;
-		try {
-			conn = RedisConnectionUtils.getConnection(factory);
-			byte[] cashKey = SerializeUtil.serialize(key);
-			byte[] cashValue = conn.get(cashKey);
-			if (cashValue == null) {
-				return null;
-			}
-			conn.expire(cashKey, 60 * 60 * 12);
-			Object value = SerializeUtil.deserialize(cashValue);
-			super.putObject(key, value);
-			return value;
-		} finally {
-			RedisConnectionUtils.releaseConnection(conn, factory);
-		}
+		Object value = CacheUtil.getLockManager().get(getKey(key), 60 * 60);
+		super.putObject(key, value);
+		return value;
+	}
+
+	private String getKey(Object key) {
+		return Constants.MYBATIS_CACHE + SecurityUtil.encryptPassword(id + JSON.toJSONString(key));
 	}
 
 	@Override
