@@ -13,7 +13,6 @@ import org.mybatis.caches.ehcache.AbstractEhcacheCache;
 
 import top.ibase4j.core.Constants;
 import top.ibase4j.core.util.CacheUtil;
-import top.ibase4j.core.util.SecurityUtil;
 
 /**
  * 二级缓存
@@ -58,7 +57,7 @@ public class EhcacheRedisCache extends AbstractEhcacheCache {
 	}
 
 	private String getKey(Object key) {
-		return Constants.MYBATIS_CACHE + SecurityUtil.encryptPassword(id + key.hashCode());
+		return Constants.MYBATIS_CACHE + id + ":"+ key.hashCode();
 	}
 
 	@Override
