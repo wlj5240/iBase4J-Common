@@ -13,6 +13,7 @@ import org.mybatis.caches.ehcache.AbstractEhcacheCache;
 
 import top.ibase4j.core.Constants;
 import top.ibase4j.core.util.CacheUtil;
+import top.ibase4j.core.util.PropertiesUtil;
 
 /**
  * 二级缓存
@@ -38,7 +39,8 @@ public class EhcacheRedisCache extends AbstractEhcacheCache {
 	public void putObject(Object key, Object value) {
 		if (value != null) {
 			super.putObject(key, value);
-			CacheUtil.getLockManager().set(getKey(key), (Serializable) value, 60 * 60);
+			CacheUtil.getLockManager().set(getKey(key), (Serializable) value,
+					PropertiesUtil.getInt("mybatis.cache.expires", 60 * 60));
 		}
 	}
 
@@ -51,13 +53,16 @@ public class EhcacheRedisCache extends AbstractEhcacheCache {
 		if (result != null) {
 			return result;
 		}
-		Object value = CacheUtil.getLockManager().get(getKey(key), 60 * 60);
-		super.putObject(key, value);
+		Object value = CacheUtil.getLockManager().get(getKey(key),
+				PropertiesUtil.getInt("mybatis.cache.expires", 60 * 60));
+		if (value != null) {
+			super.putObject(key, value);
+		}
 		return value;
 	}
 
 	private String getKey(Object key) {
-		return Constants.MYBATIS_CACHE + id + ":"+ key.hashCode();
+		return Constants.MYBATIS_CACHE + id + ":" + key.hashCode();
 	}
 
 	@Override

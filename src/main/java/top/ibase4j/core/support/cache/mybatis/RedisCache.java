@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 import top.ibase4j.core.Constants;
 import top.ibase4j.core.util.CacheUtil;
+import top.ibase4j.core.util.PropertiesUtil;
 
 /**
  * 二级缓存
@@ -40,7 +41,8 @@ public class RedisCache implements Cache {
 	@Override
 	public void putObject(Object key, Object value) {
 		if (value != null) {
-			CacheUtil.getLockManager().set(getKey(key), (Serializable) value, 60 * 60);
+			CacheUtil.getLockManager().set(getKey(key), (Serializable) value,
+					PropertiesUtil.getInt("mybatis.cache.expires", 60 * 60));
 		}
 	}
 
@@ -49,7 +51,7 @@ public class RedisCache implements Cache {
 		if (key == null) {
 			return null;
 		}
-		return CacheUtil.getLockManager().get(getKey(key), 60 * 60);
+		return CacheUtil.getLockManager().get(getKey(key), PropertiesUtil.getInt("mybatis.cache.expires", 60 * 60));
 	}
 
 	@Override
@@ -87,6 +89,6 @@ public class RedisCache implements Cache {
 	}
 
 	private String getKey(Object key) {
-		return Constants.MYBATIS_CACHE + id + ":"+ key.hashCode();
+		return Constants.MYBATIS_CACHE + id + ":" + key.hashCode();
 	}
 }
