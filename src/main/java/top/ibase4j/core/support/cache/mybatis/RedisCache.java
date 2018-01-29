@@ -73,11 +73,11 @@ public class RedisCache implements Cache {
 
 	@Override
 	public void clear() {
-		CacheUtil.getLockManager().delAll(Constants.MYBATIS_CACHE + "*");
+		CacheUtil.getLockManager().delAll(Constants.MYBATIS_CACHE + id + "*");
 	}
 
 	public int getSize() {
-		return CacheUtil.getLockManager().getAll(Constants.MYBATIS_CACHE + "*").size();
+		return CacheUtil.getLockManager().getAll(Constants.MYBATIS_CACHE + id + "*").size();
 	}
 
 	public int hashCode() {

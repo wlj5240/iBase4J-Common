@@ -61,6 +61,17 @@ public class EhcacheRedisCache extends AbstractEhcacheCache {
 		return value;
 	}
 
+	public Object removeObject(Object key) {
+		Object obj = super.removeObject(key);
+		CacheUtil.getLockManager().del(getKey(key));
+		return obj;
+	}
+	
+	public void clear() {
+		super.clear();
+		CacheUtil.getLockManager().delAll(Constants.MYBATIS_CACHE + id + "*");
+	}
+
 	private String getKey(Object key) {
 		return Constants.MYBATIS_CACHE + id + ":" + key.hashCode();
 	}
