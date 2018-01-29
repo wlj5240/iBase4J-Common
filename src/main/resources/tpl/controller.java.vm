@@ -77,9 +77,9 @@ public class ${table.controllerName} {
 	@DeleteMapping
 	@RequiresPermissions("${table.entityPath}.delete")
 	@ApiOperation(value = "删除${table.comment}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Object delete(HttpServletRequest request) {
+	public Object del(HttpServletRequest request) {
 		${entity} param = WebUtil.getParameter(request, ${entity}.class);
         ModelMap modelMap = new ModelMap();
-		return super.delete(modelMap, param);
+		return super.del(modelMap, param);
 	}
 }

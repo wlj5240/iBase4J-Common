@@ -81,19 +81,11 @@ public abstract class AbstractController<T extends BaseProvider> extends BaseCon
 
 	/** 逻辑删除 */
 	public Object del(ModelMap modelMap, BaseModel param) {
-		Parameter parameter = new Parameter(getService(), "del", param.getId(), getCurrUser());
-		logger.info("{} execute delete start...", parameter.getNo());
+		Parameter parameter = new Parameter(getService(), "del", param.getId() != null ? param.getId() : param.getIds(),
+				getCurrUser());
+		logger.info("{} execute del start...", parameter.getNo());
 		provider.execute(parameter);
-		logger.info("{} execute delete end.", parameter.getNo());
-		return setSuccessModelMap(modelMap);
-	}
-
-	/** 逻辑删除多条 */
-	public Object delAll(ModelMap modelMap, BaseModel param) {
-		Parameter parameter = new Parameter(getService(), "del", param.getIds());
-		logger.info("{} execute delete start...", parameter.getNo());
-		provider.execute(parameter);
-		logger.info("{} execute delete end.", parameter.getNo());
+		logger.info("{} execute del end.", parameter.getNo());
 		return setSuccessModelMap(modelMap);
 	}
 }
