@@ -40,7 +40,7 @@ public class EhcacheRedisCache extends AbstractEhcacheCache {
 	public void putObject(Object key, Object value) {
 		if (value != null) {
 			super.putObject(key, value);
-			CacheUtil.getLockManager().set(getKey(key), (Serializable) value,
+			CacheUtil.getCache().set(getKey(key), (Serializable) value,
 					PropertiesUtil.getInt("mybatis.cache.expires", 60 * 60));
 		}
 	}
@@ -54,8 +54,7 @@ public class EhcacheRedisCache extends AbstractEhcacheCache {
 		if (result != null) {
 			return result;
 		}
-		Object value = CacheUtil.getLockManager().get(getKey(key),
-				PropertiesUtil.getInt("mybatis.cache.expires", 60 * 60));
+		Object value = CacheUtil.getCache().get(getKey(key), PropertiesUtil.getInt("mybatis.cache.expires", 60 * 60));
 		if (value != null) {
 			super.putObject(key, value);
 		}
@@ -64,10 +63,10 @@ public class EhcacheRedisCache extends AbstractEhcacheCache {
 
 	public Object removeObject(Object key) {
 		Object obj = super.removeObject(key);
-		CacheUtil.getLockManager().del(getKey(key));
+		CacheUtil.getCache().del(getKey(key));
 		return obj;
 	}
-	
+
 	public void clear() {
 		super.clear();
 		CacheUtil.getLockManager().delAll(Constants.MYBATIS_CACHE + id + "*");

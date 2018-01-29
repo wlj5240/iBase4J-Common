@@ -42,7 +42,7 @@ public class RedisCache implements Cache {
 	@Override
 	public void putObject(Object key, Object value) {
 		if (value != null) {
-			CacheUtil.getLockManager().set(getKey(key), (Serializable) value,
+			CacheUtil.getCache().set(getKey(key), (Serializable) value,
 					PropertiesUtil.getInt("mybatis.cache.expires", 60 * 60));
 		}
 	}
@@ -52,7 +52,7 @@ public class RedisCache implements Cache {
 		if (key == null) {
 			return null;
 		}
-		return CacheUtil.getLockManager().get(getKey(key), PropertiesUtil.getInt("mybatis.cache.expires", 60 * 60));
+		return CacheUtil.getCache().get(getKey(key), PropertiesUtil.getInt("mybatis.cache.expires", 60 * 60));
 	}
 
 	@Override
@@ -68,17 +68,17 @@ public class RedisCache implements Cache {
 	@Override
 	public Object removeObject(Object key) {
 		Object obj = getObject(key);
-		CacheUtil.getLockManager().del(getKey(key));
+		CacheUtil.getCache().del(getKey(key));
 		return obj;
 	}
 
 	@Override
 	public void clear() {
-		CacheUtil.getLockManager().delAll(Constants.MYBATIS_CACHE + id + "*");
+		CacheUtil.getCache().delAll(Constants.MYBATIS_CACHE + id + "*");
 	}
 
 	public int getSize() {
-		return CacheUtil.getLockManager().getAll(Constants.MYBATIS_CACHE + id + "*").size();
+		return CacheUtil.getCache().getAll(Constants.MYBATIS_CACHE + id + "*").size();
 	}
 
 	public int hashCode() {
