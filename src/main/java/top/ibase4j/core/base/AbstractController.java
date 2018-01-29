@@ -14,7 +14,6 @@ import org.springframework.ui.ModelMap;
 
 import com.baomidou.mybatisplus.plugins.Page;
 
-
 /**
  * 控制器基类
  * 
@@ -22,60 +21,79 @@ import com.baomidou.mybatisplus.plugins.Page;
  * @version 2016年5月20日 下午3:47:58
  */
 public abstract class AbstractController<T extends BaseProvider> extends BaseController {
-    protected Logger logger = LogManager.getLogger();
-    @Autowired
-    protected T provider;
+	protected Logger logger = LogManager.getLogger();
+	@Autowired
+	protected T provider;
 
-    public abstract String getService();
+	public abstract String getService();
 
-    public Object query(ModelMap modelMap, Map<String, Object> param) {
-        if (param.get("keyword") == null && param.get("search") != null) {
-            param.put("keyword", param.get("search"));
-            param.remove("search");
-        }
-        Parameter parameter = new Parameter(getService(), "query", param);
-        logger.info("{} execute query start...", parameter.getNo());
-        Page<?> list = provider.execute(parameter).getResultPage();
-        logger.info("{} execute query end.", parameter.getNo());
-        return setSuccessModelMap(modelMap, list);
-    }
+	public Object query(ModelMap modelMap, Map<String, Object> param) {
+		if (param.get("keyword") == null && param.get("search") != null) {
+			param.put("keyword", param.get("search"));
+			param.remove("search");
+		}
+		Parameter parameter = new Parameter(getService(), "query", param);
+		logger.info("{} execute query start...", parameter.getNo());
+		Page<?> list = provider.execute(parameter).getResultPage();
+		logger.info("{} execute query end.", parameter.getNo());
+		return setSuccessModelMap(modelMap, list);
+	}
 
-    public Object queryList(ModelMap modelMap, Map<String, Object> param) {
-        Parameter parameter = new Parameter(getService(), "queryList", param);
-        logger.info("{} execute queryList start...", parameter.getNo());
-        List<?> list = provider.execute(parameter).getResultList();
-        logger.info("{} execute queryList end.", parameter.getNo());
-        return setSuccessModelMap(modelMap, list);
-    }
+	public Object queryList(ModelMap modelMap, Map<String, Object> param) {
+		Parameter parameter = new Parameter(getService(), "queryList", param);
+		logger.info("{} execute queryList start...", parameter.getNo());
+		List<?> list = provider.execute(parameter).getResultList();
+		logger.info("{} execute queryList end.", parameter.getNo());
+		return setSuccessModelMap(modelMap, list);
+	}
 
-    public Object get(ModelMap modelMap, BaseModel param) {
-        Parameter parameter = new Parameter(getService(), "queryById", param.getId());
-        logger.info("{} execute queryById start...", parameter.getNo());
-        Object result = provider.execute(parameter).getResult();
-        logger.info("{} execute queryById end.", parameter.getNo());
-        return setSuccessModelMap(modelMap, result);
-    }
+	public Object get(ModelMap modelMap, BaseModel param) {
+		Parameter parameter = new Parameter(getService(), "queryById", param.getId());
+		logger.info("{} execute queryById start...", parameter.getNo());
+		Object result = provider.execute(parameter).getResult();
+		logger.info("{} execute queryById end.", parameter.getNo());
+		return setSuccessModelMap(modelMap, result);
+	}
 
-    public Object update(ModelMap modelMap, BaseModel param) {
-        Long userId = getCurrUser();
-        if (param.getId() == null) {
-            param.setCreateBy(userId);
-            param.setCreateTime(new Date());
-        }
-        param.setUpdateBy(userId);
-        param.setUpdateTime(new Date());
-        Parameter parameter = new Parameter(getService(), "update", param);
-        logger.info("{} execute update start...", parameter.getNo());
-        provider.execute(parameter);
-        logger.info("{} execute update end.", parameter.getNo());
-        return setSuccessModelMap(modelMap);
-    }
+	public Object update(ModelMap modelMap, BaseModel param) {
+		Long userId = getCurrUser();
+		if (param.getId() == null) {
+			param.setCreateBy(userId);
+			param.setCreateTime(new Date());
+		}
+		param.setUpdateBy(userId);
+		param.setUpdateTime(new Date());
+		Parameter parameter = new Parameter(getService(), "update", param);
+		logger.info("{} execute update start...", parameter.getNo());
+		provider.execute(parameter);
+		logger.info("{} execute update end.", parameter.getNo());
+		return setSuccessModelMap(modelMap);
+	}
 
-    public Object delete(ModelMap modelMap, BaseModel param) {
-        Parameter parameter = new Parameter(getService(), "delete", param.getId());
-        logger.info("{} execute delete start...", parameter.getNo());
-        provider.execute(parameter);
-        logger.info("{} execute delete end.", parameter.getNo());
-        return setSuccessModelMap(modelMap);
-    }
+	/** 物理删除 */
+	public Object delete(ModelMap modelMap, BaseModel param) {
+		Parameter parameter = new Parameter(getService(), "delete", param.getId(), getCurrUser());
+		logger.info("{} execute delete start...", parameter.getNo());
+		provider.execute(parameter);
+		logger.info("{} execute delete end.", parameter.getNo());
+		return setSuccessModelMap(modelMap);
+	}
+
+	/** 逻辑删除 */
+	public Object del(ModelMap modelMap, BaseModel param) {
+		Parameter parameter = new Parameter(getService(), "del", param.getId(), getCurrUser());
+		logger.info("{} execute delete start...", parameter.getNo());
+		provider.execute(parameter);
+		logger.info("{} execute delete end.", parameter.getNo());
+		return setSuccessModelMap(modelMap);
+	}
+
+	/** 逻辑删除多条 */
+	public Object delAll(ModelMap modelMap, BaseModel param) {
+		Parameter parameter = new Parameter(getService(), "del", param.getIds());
+		logger.info("{} execute delete start...", parameter.getNo());
+		provider.execute(parameter);
+		logger.info("{} execute delete end.", parameter.getNo());
+		return setSuccessModelMap(modelMap);
+	}
 }

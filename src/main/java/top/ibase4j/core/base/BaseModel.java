@@ -2,6 +2,7 @@ package top.ibase4j.core.base;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableId;
@@ -24,6 +25,8 @@ public abstract class BaseModel implements Serializable {
 
 	@TableField(exist = false)
 	private String keyword;
+	@TableField(exist = false)
+	private List<Long> ids;
 
 	/**
 	 * @return the id
@@ -136,5 +139,13 @@ public abstract class BaseModel implements Serializable {
 
 	public void setKeyword(String keyword) {
 		this.keyword = keyword;
+	}
+
+	public List<Long> getIds() {
+		return ids;
+	}
+
+	public void setIds(List<Long> ids) {
+		this.ids = ids;
 	}
 }
