@@ -36,10 +36,10 @@ import top.ibase4j.core.util.PropertiesUtil;
  * @author ShenHuaJie
  * @version 2016年5月20日 下午3:19:19
  */
-public abstract class BaseService<M extends BaseMapper<T>, T extends BaseModel> {
+public abstract class BaseService<T extends BaseModel> {
     protected Logger logger = LogManager.getLogger();
     @Autowired
-    protected M mapper;
+    protected BaseMapper<T> mapper;
 
     int maxThread = PropertiesUtil.getInt("db.reader.list.maxThread", 50);
     int threadSleep = PropertiesUtil.getInt("db.reader.list.threadWait", 5);
