@@ -2,10 +2,8 @@ package ${package.Mapper};
 
 import ${package.Entity}.${entity};
 import ${superMapperClassPackage};
-#if(${enableCache})
 import org.apache.ibatis.annotations.CacheNamespace;
-import top.ibase4j.core.support.cache.mybatis.MybatisRedisCache;
-#end
+import top.ibase4j.core.support.cache.mybatis.EhcacheRedisCache;
 /**
  * <p>
  * Mapper接口
@@ -14,9 +12,7 @@ import top.ibase4j.core.support.cache.mybatis.MybatisRedisCache;
  * @author ${author}
  * @since ${date}
  */
-#if(${enableCache})
-@CacheNamespace(implementation=MybatisRedisCache.class)
-#end
+@CacheNamespace(implementation=EhcacheRedisCache.class)
 public interface ${table.mapperName} extends ${superMapperClass}<${entity}> {
 
 }
