@@ -12,7 +12,6 @@ import top.ibase4j.core.support.cache.mybatis.EhcacheRedisCache;
  * @author ${author}
  * @since ${date}
  */
-@CacheNamespace(implementation=EhcacheRedisCache.class)
 public interface ${table.mapperName} extends ${superMapperClass}<${entity}> {
 
 }
