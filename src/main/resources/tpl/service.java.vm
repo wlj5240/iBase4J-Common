@@ -1,7 +1,6 @@
 package ${package.Service};
 
 import ${package.Entity}.${entity};
-import ${package.Mapper}.${table.mapperName};
 import ${superServiceClassPackage};
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Service;
@@ -16,6 +15,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @CacheConfig(cacheNames = "${entity}")
-public class ${entity}Service extends ${superServiceClass}<${table.mapperName}, ${entity}> {
+public class ${entity}Service extends ${superServiceClass}<${entity}> {
 	
 }
