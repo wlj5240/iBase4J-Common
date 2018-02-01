@@ -2,8 +2,6 @@ package ${package.Mapper};
 
 import ${package.Entity}.${entity};
 import ${superMapperClassPackage};
-import org.apache.ibatis.annotations.CacheNamespace;
-import top.ibase4j.core.support.cache.mybatis.EhcacheRedisCache;
 /**
  * <p>
  * Mapper接口
